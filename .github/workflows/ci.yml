@@ -1,0 +1,29 @@
+name: CI
+
+# Tests + composer manifest validation across supported PHP versions.
+# No publish step: Packagist auto-updates from this public repo on a git tag
+# (one-time GitHub integration), so releasing is `git tag vX.Y.Z && git push --tags`.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, json
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --strict --no-check-publish
+      - run: composer install --no-interaction --no-progress
+      - run: composer test
