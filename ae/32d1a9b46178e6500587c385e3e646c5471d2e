@@ -1,0 +1,29 @@
+.github/workflows/ci.yml
+  s_56a860e8688b3d::t_c3063df42c1624 29-30
+src/Options.php
+  s_56a860e8688b3d::t_970c26cf299977 15,19-20,38,52
+phpstan.neon
+  s_56a860e8688b3d::t_a141849a34f687 1-4
+src/Dsn.php
+  s_56a860e8688b3d::t_6f860713850a1b 36
+composer.json
+  s_56a860e8688b3d::t_ee74b8f2c1ed2b 33,35-36
+  s_56a860e8688b3d::t_626a639512aa62 18-19
+  s_56a860e8688b3d::t_d698ea9019abc5 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ae32d1a9b46178e6500587c385e3e646c5471d2e",
+  "prompts": {},
+  "sessions": {
+    "s_56a860e8688b3d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "86266585-447a-436d-b2d7-7acca96d78db",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Tiden <dev@tiden.ai>"
+    }
+  }
+}
