@@ -1,11 +1,11 @@
 {
-    "name": "tiden/php",
+    "name": "tiden/telemetry-php",
     "description": "Tiden error-tracking PHP SDK. Emits the envelope wire format to a Tiden ingest endpoint, with no third-party error-SDK dependency.",
     "keywords": ["tiden", "error-tracking", "sdk", "php"],
-    "homepage": "https://github.com/qase-tms/tiden-php",
+    "homepage": "https://github.com/qase-tms/tiden-telemetry-php",
     "support": {
-        "issues": "https://github.com/qase-tms/tiden-php/issues",
-        "source": "https://github.com/qase-tms/tiden-php"
+        "issues": "https://github.com/qase-tms/tiden-telemetry-php/issues",
+        "source": "https://github.com/qase-tms/tiden-telemetry-php"
     },
     "license": "MIT",
     "type": "library",

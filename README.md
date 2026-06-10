@@ -1,12 +1,12 @@
-# tiden/php
+# tiden/telemetry-php
 
 Framework-agnostic error-tracking PHP SDK for
-[Tiden](https://github.com/qase-tms/tiden-php). Emits the
+[Tiden](https://github.com/qase-tms/tiden-telemetry-php). Emits the
 envelope wire format to a Tiden ingest endpoint — **no third-party error-SDK
 dependency**. For Laravel, use the `tiden/laravel` bridge (built on this).
 
 ```bash
-composer require tiden/php
+composer require tiden/telemetry-php
 ```
 
 ```php
