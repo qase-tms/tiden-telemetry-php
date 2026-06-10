@@ -18,15 +18,14 @@ final class CurlTransport implements TransportInterface
     public function __construct(
         private readonly string $url,
         private readonly float $timeout = 2.0,
-    ) {
-    }
+    ) {}
 
     public function send(string $envelope): void
     {
         if (microtime(true) < $this->rateLimitedUntil) {
             return;
         }
-        if (!function_exists('curl_init')) {
+        if (! function_exists('curl_init')) {
             return;
         }
 
@@ -38,7 +37,7 @@ final class CurlTransport implements TransportInterface
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $envelope,
-            CURLOPT_HTTPHEADER => ['Content-Type: ' . self::CONTENT_TYPE],
+            CURLOPT_HTTPHEADER => ['Content-Type: '.self::CONTENT_TYPE],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_TIMEOUT => (int) ceil($this->timeout),

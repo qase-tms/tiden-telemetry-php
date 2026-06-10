@@ -37,11 +37,11 @@ final class StacktraceBuilder
     /** @param array<string,mixed> $t */
     private static function functionName(array $t): ?string
     {
-        if (!isset($t['function']) || !is_string($t['function'])) {
+        if (! isset($t['function']) || ! is_string($t['function'])) {
             return null;
         }
         if (isset($t['class']) && is_string($t['class'])) {
-            return $t['class'] . (is_string($t['type'] ?? null) ? $t['type'] : '::') . $t['function'];
+            return $t['class'].(is_string($t['type'] ?? null) ? $t['type'] : '::').$t['function'];
         }
 
         return $t['function'];
@@ -62,7 +62,7 @@ final class StacktraceBuilder
             $frame['lineno'] = $line;
         }
         // Heuristic: vendor code is not "in app".
-        $frame['in_app'] = $file !== null && !str_contains($file, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR);
+        $frame['in_app'] = $file !== null && ! str_contains($file, DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR);
 
         return $frame;
     }
@@ -70,7 +70,7 @@ final class StacktraceBuilder
     private static function relative(string $file): string
     {
         $cwd = getcwd();
-        if ($cwd !== false && str_starts_with($file, $cwd . DIRECTORY_SEPARATOR)) {
+        if ($cwd !== false && str_starts_with($file, $cwd.DIRECTORY_SEPARATOR)) {
             return substr($file, strlen($cwd) + 1);
         }
 

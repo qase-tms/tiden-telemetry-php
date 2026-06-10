@@ -9,14 +9,14 @@ use Tiden\Scrubber;
 
 final class ScrubberTest extends TestCase
 {
-    public function testRedactsHeadersAndSecretKeysButKeepsTheRest(): void
+    public function test_redacts_headers_and_secret_keys_but_keeps_the_rest(): void
     {
         $event = [
             'request' => ['headers' => ['Authorization' => 'Bearer x', 'Accept' => 'application/json']],
             'extra' => ['password' => 'hunter2', 'order_id' => 42, 'nested' => ['api_key' => 'k', 'qty' => 3]],
         ];
 
-        $out = (new Scrubber())->scrub($event);
+        $out = (new Scrubber)->scrub($event);
 
         $this->assertSame('[Filtered]', $out['request']['headers']['Authorization']);
         $this->assertSame('application/json', $out['request']['headers']['Accept']);

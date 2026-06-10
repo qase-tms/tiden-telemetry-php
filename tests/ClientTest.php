@@ -23,9 +23,9 @@ final class ClientTest extends TestCase
         return json_decode($lines[2], true);
     }
 
-    public function testCaptureExceptionSendsCanonicalEnvelope(): void
+    public function test_capture_exception_sends_canonical_envelope(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(new Options(dsn: 'http://k@localhost:1145/proj'), $t);
 
         $id = $client->captureException(new \RuntimeException('boom'));
@@ -38,9 +38,9 @@ final class ClientTest extends TestCase
         $this->assertSame($id, $body['event_id']);
     }
 
-    public function testBeforeSendCanDropEvent(): void
+    public function test_before_send_can_drop_event(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(
             new Options(dsn: 'http://k@localhost/p', beforeSend: static fn (array $e): ?array => null),
             $t,
@@ -50,9 +50,9 @@ final class ClientTest extends TestCase
         $this->assertCount(0, $t->envelopes);
     }
 
-    public function testBeforeSendCanMutateEvent(): void
+    public function test_before_send_can_mutate_event(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(
             new Options(dsn: 'http://k@localhost/p', beforeSend: static function (array $e): array {
                 $e['tags']['injected'] = 'yes';
@@ -67,12 +67,12 @@ final class ClientTest extends TestCase
         $this->assertSame('yes', $this->body($t)['tags']['injected']);
     }
 
-    public function testScopeIsMergedIntoEvent(): void
+    public function test_scope_is_merged_into_event(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(new Options(dsn: 'http://k@localhost/p'), $t);
 
-        $scope = new Scope();
+        $scope = new Scope;
         $scope->setTag('region', 'eu');
         $scope->addBreadcrumb(new Breadcrumb('did a thing'));
 
@@ -83,12 +83,12 @@ final class ClientTest extends TestCase
         $this->assertSame('did a thing', $body['breadcrumbs']['values'][0]['message']);
     }
 
-    public function testPiiScrubbedByDefaultUnlessEnabled(): void
+    public function test_pii_scrubbed_by_default_unless_enabled(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(new Options(dsn: 'http://k@localhost/p'), $t);
 
-        $scope = new Scope();
+        $scope = new Scope;
         $scope->setExtra('password', 'hunter2');
         $client->captureMessage('x', 'info', $scope);
 

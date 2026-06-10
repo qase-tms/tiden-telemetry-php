@@ -9,17 +9,19 @@ final class Scope
 {
     /** @var array<string,string> */
     private array $tags = [];
+
     /** @var array<string,mixed> */
     private array $extra = [];
+
     /** @var array<string,mixed> */
     private array $user = [];
+
     /** @var Breadcrumb[] */
     private array $breadcrumbs = [];
+
     private ?string $level = null;
 
-    public function __construct(private readonly int $maxBreadcrumbs = 100)
-    {
-    }
+    public function __construct(private readonly int $maxBreadcrumbs = 100) {}
 
     public function setTag(string $key, string $value): void
     {
@@ -61,7 +63,7 @@ final class Scope
     }
 
     /**
-     * @param array<string,mixed> $event
+     * @param  array<string,mixed>  $event
      * @return array<string,mixed>
      */
     public function applyTo(array $event): array
@@ -75,7 +77,7 @@ final class Scope
         if ($this->user !== []) {
             $event['user'] = array_merge($event['user'] ?? [], $this->user);
         }
-        if ($this->level !== null && !isset($event['level'])) {
+        if ($this->level !== null && ! isset($event['level'])) {
             $event['level'] = $this->level;
         }
         if ($this->breadcrumbs !== []) {

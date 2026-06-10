@@ -19,20 +19,20 @@ use Tiden\Transport\NullTransport;
  */
 final class ContractTest extends TestCase
 {
-    public function testDsnIngestUrlAndAuthParam(): void
+    public function test_dsn_ingest_url_and_auth_param(): void
     {
         $dsn = Dsn::parse('http://pub@host:1140/proj-1');
         $this->assertSame('http://host:1140/api/proj-1/envelope/?tiden_key=pub', $dsn->ingestUrl);
     }
 
-    public function testEnvelopeMediaType(): void
+    public function test_envelope_media_type(): void
     {
         $this->assertSame('application/x-tiden-envelope', CurlTransport::CONTENT_TYPE);
     }
 
-    public function testEnvelopeFramingAndEventShape(): void
+    public function test_envelope_framing_and_event_shape(): void
     {
-        $t = new NullTransport();
+        $t = new NullTransport;
         $client = new Client(
             new Options(dsn: 'http://k@host/p', release: 'app@1.2.3', environment: 'production'),
             $t,

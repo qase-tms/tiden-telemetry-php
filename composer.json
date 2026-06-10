@@ -15,6 +15,8 @@
         "ext-json": "*"
     },
     "require-dev": {
+        "laravel/pint": "^1.18",
+        "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^11.5"
     },
     "autoload": {
@@ -28,7 +30,10 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "lint": "pint --test",
+        "format": "pint"
     },
     "config": {
         "sort-packages": true

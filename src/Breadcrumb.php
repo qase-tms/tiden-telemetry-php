@@ -15,8 +15,7 @@ final class Breadcrumb
         public readonly ?string $type = null,
         public readonly array $data = [],
         public readonly ?float $timestamp = null,
-    ) {
-    }
+    ) {}
 
     /** @return array<string,mixed> */
     public function toArray(): array

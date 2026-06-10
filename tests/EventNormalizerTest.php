@@ -19,7 +19,7 @@ final class EventNormalizerTest extends TestCase
         ));
     }
 
-    public function testFromExceptionBuildsCanonicalShape(): void
+    public function test_from_exception_builds_canonical_shape(): void
     {
         $event = $this->normalizer()->fromException(new \RuntimeException('boom'));
 
@@ -35,7 +35,7 @@ final class EventNormalizerTest extends TestCase
         $this->assertNotEmpty($value['stacktrace']['frames']);
     }
 
-    public function testChainedExceptionsOrderRootCauseFirst(): void
+    public function test_chained_exceptions_order_root_cause_first(): void
     {
         $root = new \RuntimeException('root cause');
         $wrapper = new \LogicException('wrapper', 0, $root);
@@ -48,7 +48,7 @@ final class EventNormalizerTest extends TestCase
         $this->assertSame('LogicException', $values[1]['type']);
     }
 
-    public function testFromMessage(): void
+    public function test_from_message(): void
     {
         $event = $this->normalizer()->fromMessage('hello', 'warning');
 

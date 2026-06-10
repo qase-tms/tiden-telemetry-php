@@ -26,4 +26,6 @@ jobs:
           tools: composer:v2
       - run: composer validate --strict --no-check-publish
       - run: composer install --no-interaction --no-progress
+      - run: composer lint
+      - run: composer analyse
       - run: composer test

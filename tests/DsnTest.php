@@ -9,7 +9,7 @@ use Tiden\Dsn;
 
 final class DsnTest extends TestCase
 {
-    public function testParsesDsnIntoIngestUrl(): void
+    public function test_parses_dsn_into_ingest_url(): void
     {
         $dsn = Dsn::parse('http://pub@localhost:1145/6ef7807d');
 
@@ -21,13 +21,13 @@ final class DsnTest extends TestCase
         );
     }
 
-    public function testRejectsDsnWithoutKey(): void
+    public function test_rejects_dsn_without_key(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Dsn::parse('http://localhost/6ef7807d');
     }
 
-    public function testRejectsDsnWithoutProject(): void
+    public function test_rejects_dsn_without_project(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Dsn::parse('http://pub@localhost');

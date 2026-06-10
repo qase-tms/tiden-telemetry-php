@@ -9,7 +9,7 @@ use Tiden\StacktraceBuilder;
 
 final class StacktraceBuilderTest extends TestCase
 {
-    public function testInnermostFrameIsTheThrowLocation(): void
+    public function test_innermost_frame_is_the_throw_location(): void
     {
         $line = __LINE__ + 1;
         $e = new \RuntimeException('boom');

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tiden;
 
-use Tiden\Transport\TransportInterface;
-
 /**
  * Static entry point. `Sdk::init([...])` once at bootstrap, then capture from
  * anywhere. Optionally installs global handlers so uncaught exceptions, PHP
@@ -17,11 +15,13 @@ use Tiden\Transport\TransportInterface;
 final class Sdk
 {
     private static ?Client $client = null;
+
     private static ?Scope $scope = null;
+
     private static bool $handlersRegistered = false;
 
     /**
-     * @param array<string,mixed>|Options $options
+     * @param  array<string,mixed>|Options  $options
      */
     public static function init(array|Options $options, bool $captureGlobals = true): void
     {
@@ -38,7 +38,7 @@ final class Sdk
     public static function bind(Client $client, ?Scope $scope = null): void
     {
         self::$client = $client;
-        self::$scope = $scope ?? new Scope();
+        self::$scope = $scope ?? new Scope;
     }
 
     public static function captureException(\Throwable $e): ?string

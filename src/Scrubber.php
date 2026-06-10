@@ -22,7 +22,7 @@ final class Scrubber
     ];
 
     /**
-     * @param array<string,mixed> $event
+     * @param  array<string,mixed>  $event
      * @return array<string,mixed>
      */
     public function scrub(array $event): array
@@ -45,7 +45,7 @@ final class Scrubber
     }
 
     /**
-     * @param array<mixed> $data
+     * @param  array<mixed>  $data
      * @return array<mixed>
      */
     private function scrubKeys(array $data): array

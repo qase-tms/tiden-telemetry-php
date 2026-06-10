@@ -16,8 +16,7 @@ final class Dsn
         public readonly string $ingestUrl,
         public readonly string $publicKey,
         public readonly string $projectId,
-    ) {
-    }
+    ) {}
 
     public static function parse(string $dsn): self
     {
@@ -34,14 +33,14 @@ final class Dsn
             );
         }
 
-        $projectId = explode('/', trim($u['path'], '/'))[0] ?? '';
+        $projectId = explode('/', trim($u['path'], '/'))[0];
         if ($projectId === '') {
             throw new \InvalidArgumentException('Tiden: invalid DSN (missing project id)');
         }
 
         $host = $u['host'];
         if (isset($u['port'])) {
-            $host .= ':' . $u['port'];
+            $host .= ':'.$u['port'];
         }
 
         $ingestUrl = sprintf(

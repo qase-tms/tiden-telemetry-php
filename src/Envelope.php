@@ -32,6 +32,6 @@ final class Envelope
             'content_type' => 'application/json',
         ]);
 
-        return $header . "\n" . $item . "\n" . $body . "\n";
+        return $header."\n".$item."\n".$body."\n";
     }
 }

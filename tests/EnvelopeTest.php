@@ -9,7 +9,7 @@ use Tiden\Envelope;
 
 final class EnvelopeTest extends TestCase
 {
-    public function testSerializesThreeLineEnvelopeWithByteLength(): void
+    public function test_serializes_three_line_envelope_with_byte_length(): void
     {
         $event = ['event_id' => 'abc123', 'platform' => 'php', 'message' => 'héllo'];
 

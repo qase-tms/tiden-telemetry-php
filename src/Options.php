@@ -12,12 +12,12 @@ final class Options
 {
     public readonly Dsn $dsn;
 
-    /** @var (callable(array): (array|null))|null */
+    /** @var (callable(array<string,mixed>): (array<string,mixed>|null))|null */
     private $beforeSend;
 
     /**
-     * @param (callable(array): (array|null))|null $beforeSend Last-chance hook to
-     *        mutate or drop an event; return null to drop.
+     * @param  (callable(array<string,mixed>): (array<string,mixed>|null))|null  $beforeSend  Last-chance hook to
+     *                                                                                        mutate or drop an event; return null to drop.
      */
     public function __construct(
         string $dsn,
@@ -35,7 +35,7 @@ final class Options
     public static function fromArray(array $o): self
     {
         $dsn = $o['dsn'] ?? null;
-        if (!is_string($dsn) || $dsn === '') {
+        if (! is_string($dsn) || $dsn === '') {
             throw new \InvalidArgumentException('Tiden: "dsn" is required');
         }
 
@@ -49,7 +49,7 @@ final class Options
         );
     }
 
-    /** @return (callable(array): (array|null))|null */
+    /** @return (callable(array<string,mixed>): (array<string,mixed>|null))|null */
     public function beforeSend(): ?callable
     {
         return $this->beforeSend;

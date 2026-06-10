@@ -16,13 +16,14 @@ final class Client
     public const VERSION = '0.1.0';
 
     private readonly Scrubber $scrubber;
+
     private readonly EventNormalizer $normalizer;
 
     public function __construct(
         private readonly Options $options,
         private readonly TransportInterface $transport,
     ) {
-        $this->scrubber = new Scrubber();
+        $this->scrubber = new Scrubber;
         $this->normalizer = new EventNormalizer($options);
     }
 
@@ -48,7 +49,7 @@ final class Client
     }
 
     /**
-     * @param array<string,mixed> $event
+     * @param  array<string,mixed>  $event
      * @return string|null the event_id, or null if dropped
      */
     private function capture(array $event, ?Scope $scope): ?string
@@ -57,14 +58,14 @@ final class Client
             if ($scope !== null) {
                 $event = $scope->applyTo($event);
             }
-            if (!$this->options->sendDefaultPii) {
+            if (! $this->options->sendDefaultPii) {
                 $event = $this->scrubber->scrub($event);
             }
 
             $beforeSend = $this->options->beforeSend();
             if ($beforeSend !== null) {
                 $result = $beforeSend($event);
-                if (!is_array($result)) {
+                if (! is_array($result)) {
                     return null; // dropped
                 }
                 $event = $result;
