@@ -1,0 +1,19 @@
+LICENSE
+  s_adc345102486d7::t_12fd46d47e5a79 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d2f6288d2a92f5eed5946f5e00ecd2a4accd97c8",
+  "prompts": {},
+  "sessions": {
+    "s_adc345102486d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99aaa5be-ca66-4169-a179-6d506444230e",
+        "model": "unknown"
+      },
+      "human_author": "Nikolay Pisarev <npisarev@qase.io>"
+    }
+  }
+}
