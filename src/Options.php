@@ -66,7 +66,7 @@ final class Options
             onTransportFailure: isset($o['on_transport_failure']) && is_callable($o['on_transport_failure'])
                 ? $o['on_transport_failure']
                 : null,
-            retryAfterDefault: (float) ($o['retry_after_default'] ?? 60.0),
+            retryAfterDefault: self::positiveFloat($o['retry_after_default'] ?? null, 60.0),
         );
     }
 
