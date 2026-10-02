@@ -15,6 +15,15 @@ final class Client
 {
     public const VERSION = '0.1.0';
 
+    /** Tag listing what the size cap removed or cut: "breadcrumbs", then ",extra", then ",exception". */
+    public const TRUNCATED_TAG = 'tiden.truncated';
+
+    /** Each `extra` value is cut to this many bytes when the envelope is over the cap. */
+    public const EXTRA_VALUE_LIMIT = 1024;
+
+    /** Exception values and the message are cut to this many bytes when still over the cap. */
+    public const EXCEPTION_VALUE_LIMIT = 8192;
+
     private readonly Scrubber $scrubber;
 
     private readonly EventNormalizer $normalizer;
@@ -106,12 +115,111 @@ final class Client
                 $event = $result;
             }
 
-            $this->transport->send(Envelope::serialize($event));
+            $envelope = $this->fitToCap($event);
+            if ($envelope === null) {
+                return null; // dropped: still over max_envelope_bytes after every shrink step
+            }
+
+            $this->transport->send($envelope);
 
             return is_string($event['event_id'] ?? null) ? $event['event_id'] : null;
         } catch (\Throwable) {
             // Monitoring must never crash the app it monitors.
             return null;
+        }
+    }
+
+    /**
+     * Serializes $event and, while the envelope is over max_envelope_bytes, shrinks it
+     * in order: drop breadcrumbs, cut `extra` values, cut exception values and message.
+     * Each step is tagged in `tiden.truncated`. Returns null (and reports
+     * envelope_too_large) when the event is still over the cap.
+     *
+     * @param  array<string,mixed>  $event
+     */
+    private function fitToCap(array $event): ?string
+    {
+        $cap = $this->options->maxEnvelopeBytes;
+        $envelope = Envelope::serialize($event);
+        if (strlen($envelope) <= $cap) {
+            return $envelope;
+        }
+
+        $steps = [
+            'breadcrumbs' => static function (array $e): array {
+                unset($e['breadcrumbs']);
+
+                return $e;
+            },
+            'extra' => static function (array $e): array {
+                if (isset($e['extra']) && is_array($e['extra'])) {
+                    foreach ($e['extra'] as $k => $v) {
+                        $e['extra'][$k] = self::cutExtra($v);
+                    }
+                }
+
+                return $e;
+            },
+            'exception' => static function (array $e): array {
+                if (isset($e['exception']['values']) && is_array($e['exception']['values'])) {
+                    foreach ($e['exception']['values'] as $i => $value) {
+                        if (is_array($value) && is_string($value['value'] ?? null)) {
+                            $e['exception']['values'][$i]['value'] = Truncate::utf8($value['value'], self::EXCEPTION_VALUE_LIMIT);
+                        }
+                    }
+                }
+                if (is_string($e['message'] ?? null)) {
+                    $e['message'] = Truncate::utf8($e['message'], self::EXCEPTION_VALUE_LIMIT);
+                }
+
+                return $e;
+            },
+        ];
+
+        $applied = [];
+        foreach ($steps as $name => $step) {
+            $event = $step($event);
+            $applied[] = $name;
+            if (! isset($event['tags']) || ! is_array($event['tags'])) {
+                $event['tags'] = [];
+            }
+            $event['tags'][self::TRUNCATED_TAG] = implode(',', $applied);
+
+            $envelope = Envelope::serialize($event);
+            if (strlen($envelope) <= $cap) {
+                return $envelope;
+            }
+        }
+
+        $this->reportTooLarge(strlen($envelope));
+
+        return null;
+    }
+
+    /** Strings are cut to EXTRA_VALUE_LIMIT; other values keep their type unless their JSON is over it. */
+    private static function cutExtra(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return Truncate::utf8($value, self::EXTRA_VALUE_LIMIT);
+        }
+        $json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($json === false) {
+            return '';
+        }
+
+        return strlen($json) <= self::EXTRA_VALUE_LIMIT ? $value : Truncate::utf8($json, self::EXTRA_VALUE_LIMIT);
+    }
+
+    private function reportTooLarge(int $bytes): void
+    {
+        $callback = $this->options->onTransportFailure();
+        if ($callback === null) {
+            return;
+        }
+        try {
+            $callback(['reason' => 'envelope_too_large', 'status' => null, 'bytes' => $bytes, 'curl_errno' => null]);
+        } catch (\Throwable) {
+            // A failing callback must not turn a dropped event into a crash.
         }
     }
 }
