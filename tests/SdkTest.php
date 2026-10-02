@@ -31,6 +31,15 @@ final class SdkTest extends TestCase
         return json_decode($lines[2], true);
     }
 
+    /** @return array<int,mixed> the private Sdk::$scopeStack */
+    private function scopeStack(): array
+    {
+        $value = (new \ReflectionProperty(Sdk::class, 'scopeStack'))->getValue();
+        $this->assertIsArray($value);
+
+        return $value;
+    }
+
     private function bindNull(): NullTransport
     {
         $t = new NullTransport;
@@ -123,20 +132,18 @@ final class SdkTest extends TestCase
     {
         $this->bindNull();
         Sdk::pushScope();
+        $this->assertCount(1, $this->scopeStack());
 
         Sdk::close();
-        $this->bindNull();
 
-        $this->assertFalse(Sdk::popScope());
+        $this->assertSame([], $this->scopeStack());
     }
 
     public function test_push_scope_before_init_is_noop(): void
     {
         Sdk::pushScope();
-        $this->assertNull(Sdk::getClient());
 
-        $this->bindNull();
-
+        $this->assertSame([], $this->scopeStack());
         $this->assertFalse(Sdk::popScope());
     }
 

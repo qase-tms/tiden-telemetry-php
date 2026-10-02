@@ -177,4 +177,17 @@ final class ClientTest extends TestCase
         $this->assertCount(1, $t1->envelopes);
         $this->assertCount(1, $t2->envelopes);
     }
+
+    public function test_memoised_throwable_can_be_garbage_collected(): void
+    {
+        $client = new Client(new Options(dsn: 'http://k@localhost/p'), new NullTransport);
+        $e = new \RuntimeException('boom');
+        $this->assertNotNull($client->captureException($e));
+        $ref = \WeakReference::create($e);
+
+        unset($e);
+        gc_collect_cycles();
+
+        $this->assertNull($ref->get());
+    }
 }
