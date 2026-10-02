@@ -32,7 +32,7 @@ Sdk::addBreadcrumb(new \Tiden\Breadcrumb('cache miss', category: 'cache'));
 Sdk::configureScope(fn ($s) => $s->setTag('tenant', 'acme'));
 ```
 
-### Scopes
+### Scopes, custom events and the test transport
 
 A long-running worker can isolate one unit of work (a job, a command) with a
 scope stack. `pushScope()` continues on a copy of the current scope;
