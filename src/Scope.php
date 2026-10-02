@@ -63,6 +63,16 @@ final class Scope
     }
 
     /**
+     * Empties the breadcrumb trail only. Tags, user, extra and level stay, so a
+     * long-running worker can start a new unit of work without losing the
+     * context that was set for the whole process.
+     */
+    public function clearBreadcrumbs(): void
+    {
+        $this->breadcrumbs = [];
+    }
+
+    /**
      * @param  array<string,mixed>  $event
      * @return array<string,mixed>
      */
