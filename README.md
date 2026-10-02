@@ -100,8 +100,8 @@ Sdk::init(['dsn' => 'http://key@localhost/1'], captureGlobals: false, transport:
 | `send_default_pii` | `$sendDefaultPii` | `false` | Keep likely-PII instead of scrubbing it. |
 | `max_breadcrumbs` | `$maxBreadcrumbs` | `100` | Breadcrumbs kept per scope. |
 | `before_send` | `$beforeSend` | `null` | `fn (array $event): ?array`; return `null` to drop. |
-| `http_timeout` | `$httpTimeout` | `2.0` | Total seconds per send. The connect timeout is `min(http_timeout, 1.0)`. |
-| `max_envelope_bytes` | `$maxEnvelopeBytes` | `921600` | Envelope size cap (the ingest rejects bodies over 1 MiB). |
+| `http_timeout` | `$httpTimeout` | `2.0` | Total seconds per send. The connect timeout is `min(http_timeout, 1.0)`. `fromArray` uses the default for empty or non-positive values. |
+| `max_envelope_bytes` | `$maxEnvelopeBytes` | `921600` | Envelope size cap (the ingest rejects bodies over 1 MiB). `fromArray` uses the default for empty or non-positive values. |
 | `on_transport_failure` | `$onTransportFailure` | `null` | Called for every event that is not delivered. Ignored when not callable. |
 | `retry_after_default` | `$retryAfterDefault` | `60.0` | Seconds to pause after a 429 that has no `Retry-After`. |
 
@@ -129,11 +129,15 @@ Other non-2xx responses are reported and do not pause sending.
 
 | `reason` | When | `status` | `curl_errno` |
 |---|---|---|---|
-| `curl_error` | curl failed (7 = connection refused, 28 = timeout, ...); starts the 30 s pause | `null` | set |
+| `curl_error` | curl failed (7 = connection refused, 28 = timeout, ...); starts the 30 s pause | `null` | set, or `null` when no handle could be created |
 | `http_error` | any non-2xx response other than 429 | set | `null` |
 | `rate_limited` | HTTP 429; starts the Retry-After pause | `429` | `null` |
 | `suppressed` | skipped because a pause is active | `null` | `null` |
 | `envelope_too_large` | still over `max_envelope_bytes` after shrinking (see below) | `null` | `null` |
+
+A `curl_error` with `curl_errno` `null` means no curl handle could be
+created (ext-curl missing, or `curl_init()` failed); nothing was sent, so it
+starts no pause.
 
 `bytes` is the envelope size in bytes. The array never contains the URL (it
 carries the DSN key) or the event. Exceptions thrown by the callback are
@@ -154,7 +158,9 @@ as soon as it fits:
 
 Cuts never split a UTF-8 character. A shrunk event carries the tag
 `tiden.truncated` with the steps applied: `breadcrumbs`, `breadcrumbs,extra` or
-`breadcrumbs,extra,exception`.
+`breadcrumbs,extra,exception`. The tag records the last stage reached, even
+when a stage found nothing to remove (for example, an event with no
+breadcrumbs still reports `breadcrumbs`).
 
 Source maps are a browser concern (JS bundles); PHP isn't minified, so there is
 no source-map counterpart here.
