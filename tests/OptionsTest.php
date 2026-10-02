@@ -93,10 +93,12 @@ final class OptionsTest extends TestCase
             'dsn' => 'http://k@localhost/p',
             'http_timeout' => $value,
             'max_envelope_bytes' => $value,
+            'retry_after_default' => $value,
         ]);
 
         $this->assertSame(2.0, $o->httpTimeout);
         $this->assertSame(921600, $o->maxEnvelopeBytes);
+        $this->assertSame(60.0, $o->retryAfterDefault);
     }
 
     public function test_from_array_accepts_sub_second_timeout(): void

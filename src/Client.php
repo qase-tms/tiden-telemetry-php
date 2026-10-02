@@ -131,7 +131,13 @@ final class Client
 
     public function captureMessage(string $message, string $level = 'info', ?Scope $scope = null): ?string
     {
-        return $this->capture($this->normalizer->fromMessage($message, $level), $scope);
+        try {
+            $event = $this->normalizer->fromMessage($message, $level);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $this->capture($event, $scope);
     }
 
     /** @param array<string,mixed> $event */
