@@ -1,0 +1,33 @@
+src/Client.php
+  s_8fd348171deb62::t_87a4d0d86a7c76 41-46
+src/Transport/CurlTransport.php
+  s_6b815d6a11a5f5::t_305a03be30b5ef 9-16,23-24,26-35,39-44,48-61,73,77-78,80-90,93-94,99-132
+tests/CurlTransportTest.php
+  s_6b815d6a11a5f5::t_3d72bdeb91994f 1-272
+tests/fixtures/router.php
+  s_6b815d6a11a5f5::t_e4b77a1ec189da 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "df67db3ebe7666603e591c4f970462e9433b6680",
+  "prompts": {},
+  "sessions": {
+    "s_6b815d6a11a5f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4eb86e2-6bb5-44d5-b5d2-48c51eb2f5f1",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    },
+    "s_8fd348171deb62": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "407c6916-9b4c-46a4-87a6-e0743792950b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
