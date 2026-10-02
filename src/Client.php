@@ -38,7 +38,12 @@ final class Client
 
     public static function create(Options $options, ?TransportInterface $transport = null): self
     {
-        return new self($options, $transport ?? new CurlTransport($options->dsn->ingestUrl));
+        return new self($options, $transport ?? new CurlTransport(
+            $options->dsn->ingestUrl,
+            $options->httpTimeout,
+            $options->onTransportFailure(),
+            $options->retryAfterDefault,
+        ));
     }
 
     /**
