@@ -1,0 +1,21 @@
+src/Options.php
+  s_6b815d6a11a5f5::t_5016e57def954b 64-65,73-94
+tests/OptionsTest.php
+  s_6b815d6a11a5f5::t_c072927a452f60 7,77-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "00b4571c51a5f221e5bc3398e6d3532fc225b38b",
+  "prompts": {},
+  "sessions": {
+    "s_6b815d6a11a5f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4eb86e2-6bb5-44d5-b5d2-48c51eb2f5f1",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
