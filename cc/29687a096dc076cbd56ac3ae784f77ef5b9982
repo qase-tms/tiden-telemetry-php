@@ -1,0 +1,21 @@
+src/Transport/CurlTransport.php
+  s_6b815d6a11a5f5::t_4f04c1ef67ee7d 64,66-67,73-74
+tests/CurlTransportTest.php
+  s_6b815d6a11a5f5::t_14f9c4d6d4c765 63-66,90-91,213-226,257,262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cc29687a096dc076cbd56ac3ae784f77ef5b9982",
+  "prompts": {},
+  "sessions": {
+    "s_6b815d6a11a5f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4eb86e2-6bb5-44d5-b5d2-48c51eb2f5f1",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
