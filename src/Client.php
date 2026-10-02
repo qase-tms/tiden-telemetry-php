@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tiden;
 
+use Composer\InstalledVersions;
 use Tiden\Transport\CurlTransport;
 use Tiden\Transport\TransportInterface;
 
@@ -13,7 +14,8 @@ use Tiden\Transport\TransportInterface;
  */
 final class Client
 {
-    public const VERSION = '0.1.0';
+    /** Fallback when Composer's runtime API cannot name an installed release. */
+    public const VERSION = '0.2.0';
 
     /** Tag listing what the size cap removed or cut: "breadcrumbs", then ",extra", then ",exception". */
     public const TRUNCATED_TAG = 'tiden.truncated';
@@ -23,6 +25,8 @@ final class Client
 
     /** Exception values and the message are cut to this many bytes when still over the cap. */
     public const EXCEPTION_VALUE_LIMIT = 8192;
+
+    private static ?string $version = null;
 
     private readonly Scrubber $scrubber;
 
@@ -53,6 +57,37 @@ final class Client
             $options->onTransportFailure(),
             $options->retryAfterDefault,
         ));
+    }
+
+    /**
+     * The installed package version from Composer's runtime API, or VERSION when
+     * Composer cannot name a release (no InstalledVersions, the package is the
+     * root project, or a dev branch is installed). A tag's leading "v" is dropped
+     * so the value has the same shape as VERSION ("v0.2.0" -> "0.2.0").
+     */
+    public static function version(): string
+    {
+        if (self::$version !== null) {
+            return self::$version;
+        }
+
+        $resolved = self::VERSION;
+        try {
+            if (class_exists(InstalledVersions::class)
+                && InstalledVersions::isInstalled('tiden/telemetry-php')) {
+                $pretty = InstalledVersions::getPrettyVersion('tiden/telemetry-php');
+                if (is_string($pretty) && $pretty !== ''
+                    && ! str_starts_with($pretty, 'dev-')
+                    && ! str_ends_with($pretty, '-dev')
+                    && ! str_contains($pretty, 'no-version-set')) {
+                    $resolved = preg_replace('/^v(?=\d)/', '', $pretty) ?? $pretty;
+                }
+            }
+        } catch (\Throwable) {
+            // Fall back to the constant.
+        }
+
+        return self::$version = $resolved;
     }
 
     /**

@@ -51,7 +51,7 @@ final class EventNormalizer
             'timestamp' => microtime(true),
             'platform' => 'php',
             'level' => $level,
-            'sdk' => ['name' => 'tiden.php', 'version' => Client::VERSION],
+            'sdk' => ['name' => 'tiden.php', 'version' => Client::version()],
         ];
         if ($this->options->release !== null) {
             $event['release'] = $this->options->release;

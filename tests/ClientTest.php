@@ -365,4 +365,16 @@ final class ClientTest extends TestCase
         $this->assertSame('breadcrumbs,extra', $body['tags'][Client::TRUNCATED_TAG]);
         $this->assertSame(Client::EXTRA_VALUE_LIMIT, strlen($body['extra']['added_by_before_send']));
     }
+
+    public function test_sdk_version_comes_from_version(): void
+    {
+        $t = new NullTransport;
+        $client = new Client(new Options(dsn: 'http://k@localhost/p'), $t);
+
+        $client->captureMessage('v');
+
+        $this->assertSame('0.2.0', Client::VERSION);
+        $this->assertSame(Client::version(), $this->body($t)['sdk']['version']);
+        $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+/', Client::version());
+    }
 }
