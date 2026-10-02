@@ -1,0 +1,41 @@
+README.md
+  s_6b815d6a11a5f5::t_ff70ca4640ed2c 20-23,87-90,94-164
+src/Client.php
+  s_6b815d6a11a5f5::t_0a9d1af4334fb9 7,17-29,54-103,166-171,179-272
+src/EventNormalizer.php
+  s_6b815d6a11a5f5::t_30eb1a6e1daa90 54
+src/Options.php
+  s_6b815d6a11a5f5::t_b7cab75f7f307f 10-11,20-22,26-30,39-42,46,64-69,73-94,100-105
+src/Transport/CurlTransport.php
+  s_6b815d6a11a5f5::t_707955283fefb9 9-16,23-24,26-35,39-44,48-61,64,66-67,73-74,78,82-83,85-95,98-99,104-137
+src/Truncate.php
+  s_6b815d6a11a5f5::t_316c5dafb93513 1-69
+tests/ClientTest.php
+  s_6b815d6a11a5f5::t_436fd10f018344 193-380
+tests/CurlTransportTest.php
+  s_6b815d6a11a5f5::t_db26176872358b 1-292
+tests/OptionsTest.php
+  s_6b815d6a11a5f5::t_d87122f91a9cb0 1-108
+tests/TruncateTest.php
+  s_6b815d6a11a5f5::t_c3f0c99e44b9a7 1-53
+tests/VersionTest.php
+  s_6b815d6a11a5f5::t_780c4e9665bbe8 1-47
+tests/fixtures/router.php
+  s_6b815d6a11a5f5::t_486fb23c474a48 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bdef83eb839115fa4df2634f1b03370c4f78115b",
+  "prompts": {},
+  "sessions": {
+    "s_6b815d6a11a5f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4eb86e2-6bb5-44d5-b5d2-48c51eb2f5f1",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
