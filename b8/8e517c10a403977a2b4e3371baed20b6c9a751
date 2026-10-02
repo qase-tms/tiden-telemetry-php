@@ -1,0 +1,21 @@
+src/Sdk.php
+  s_6b815d6a11a5f5::t_fb487706c2d176 7-8,23-25,30-31,33,36,38,50,63-68,82-106,117
+tests/SdkTest.php
+  s_6b815d6a11a5f5::t_e3983f433004f3 1-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b88e517c10a403977a2b4e3371baed20b6c9a751",
+  "prompts": {},
+  "sessions": {
+    "s_6b815d6a11a5f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4eb86e2-6bb5-44d5-b5d2-48c51eb2f5f1",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
