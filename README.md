@@ -32,6 +32,48 @@ Sdk::addBreadcrumb(new \Tiden\Breadcrumb('cache miss', category: 'cache'));
 Sdk::configureScope(fn ($s) => $s->setTag('tenant', 'acme'));
 ```
 
+### Scopes, custom events and the test transport
+
+A long-running worker can isolate one unit of work (a job, a command) with a
+scope stack. `pushScope()` continues on a copy of the current scope;
+`popScope()` restores the saved one and discards the tags and breadcrumbs added
+since (it returns `false` when nothing was pushed). To start a new unit of work
+without losing process-wide tags, user and extra, clear only the breadcrumbs:
+
+```php
+Sdk::pushScope();
+try {
+    Sdk::configureScope(fn ($s) => $s->setTag('job', 'send-mail'));
+    runJob();
+} finally {
+    Sdk::popScope();
+}
+
+Sdk::configureScope(fn ($s) => $s->clearBreadcrumbs()); // tags, user, extra stay
+
+// Send a hand-built event through the current scope. It is sent as given:
+// set event_id, timestamp and platform yourself. Returns its event_id.
+Sdk::captureEvent([
+    'event_id' => \Tiden\EventNormalizer::uuid4(),
+    'timestamp' => microtime(true),
+    'platform' => 'php',
+    'level' => 'warning',
+    'message' => 'custom',
+]);
+```
+
+The same `\Throwable` object is sent once per client: a second
+`captureException()` returns the first event id without sending again.
+
+`Sdk::init()` takes an optional transport as its third argument, so tests can
+use the real init path without the network:
+
+```php
+$transport = new \Tiden\Transport\NullTransport;
+Sdk::init(['dsn' => 'http://key@localhost/1'], captureGlobals: false, transport: $transport);
+// $transport->envelopes holds every serialized envelope.
+```
+
 ## What it does
 
 - Parses the DSN to the edge URL `/api/<projectId>/envelope/?tiden_key=…`.

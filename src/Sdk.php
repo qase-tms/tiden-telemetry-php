@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tiden;
 
+use Tiden\Transport\TransportInterface;
+
 /**
  * Static entry point. `Sdk::init([...])` once at bootstrap, then capture from
  * anywhere. Optionally installs global handlers so uncaught exceptions, PHP
@@ -18,16 +20,22 @@ final class Sdk
 
     private static ?Scope $scope = null;
 
+    /** @var list<Scope> scopes saved by pushScope(), most recent last */
+    private static array $scopeStack = [];
+
     private static bool $handlersRegistered = false;
 
     /**
      * @param  array<string,mixed>|Options  $options
+     * @param  TransportInterface|null  $transport  replaces the default curl
+     *                                              transport (e.g. a `NullTransport` in tests)
      */
-    public static function init(array|Options $options, bool $captureGlobals = true): void
+    public static function init(array|Options $options, bool $captureGlobals = true, ?TransportInterface $transport = null): void
     {
         $opts = $options instanceof Options ? $options : Options::fromArray($options);
-        self::$client = Client::create($opts);
+        self::$client = Client::create($opts, $transport);
         self::$scope = new Scope($opts->maxBreadcrumbs);
+        self::$scopeStack = [];
 
         if ($captureGlobals) {
             self::registerHandlers();
@@ -39,6 +47,7 @@ final class Sdk
     {
         self::$client = $client;
         self::$scope = $scope ?? new Scope;
+        self::$scopeStack = [];
     }
 
     public static function captureException(\Throwable $e): ?string
@@ -49,6 +58,12 @@ final class Sdk
     public static function captureMessage(string $message, string $level = 'info'): ?string
     {
         return self::$client?->captureMessage($message, $level, self::$scope);
+    }
+
+    /** @param array<string,mixed> $event */
+    public static function captureEvent(array $event): ?string
+    {
+        return self::$client?->captureEvent($event, self::$scope);
     }
 
     public static function addBreadcrumb(Breadcrumb $breadcrumb): void
@@ -64,6 +79,31 @@ final class Sdk
         }
     }
 
+    /**
+     * Saves the current scope and continues on a copy of it. Changes made until
+     * the matching popScope() (tags, breadcrumbs, ...) are discarded then.
+     * No-op before init()/bind().
+     */
+    public static function pushScope(): void
+    {
+        if (self::$scope === null) {
+            return;
+        }
+        self::$scopeStack[] = self::$scope;
+        self::$scope = clone self::$scope;
+    }
+
+    /** Restores the scope saved by the last pushScope(); false when there is none. */
+    public static function popScope(): bool
+    {
+        if (self::$scope === null || self::$scopeStack === []) {
+            return false;
+        }
+        self::$scope = array_pop(self::$scopeStack);
+
+        return true;
+    }
+
     public static function getClient(): ?Client
     {
         return self::$client;
@@ -74,6 +114,7 @@ final class Sdk
     {
         self::$client = null;
         self::$scope = null;
+        self::$scopeStack = [];
     }
 
     private static function registerHandlers(): void

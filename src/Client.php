@@ -19,12 +19,21 @@ final class Client
 
     private readonly EventNormalizer $normalizer;
 
+    /**
+     * Throwables this client already sent, mapped to their event id. Weak keys,
+     * so a memoised exception is still garbage-collected.
+     *
+     * @var \WeakMap<\Throwable,string>
+     */
+    private \WeakMap $sent;
+
     public function __construct(
         private readonly Options $options,
         private readonly TransportInterface $transport,
     ) {
         $this->scrubber = new Scrubber;
         $this->normalizer = new EventNormalizer($options);
+        $this->sent = new \WeakMap;
     }
 
     public static function create(Options $options, ?TransportInterface $transport = null): self
@@ -32,9 +41,30 @@ final class Client
         return new self($options, $transport ?? new CurlTransport($options->dsn->ingestUrl));
     }
 
+    /**
+     * The same Throwable object is sent once: a repeat capture (e.g. a framework
+     * report() plus a log listener seeing the same exception) returns the first
+     * event id without sending. A capture that was dropped (before_send returned
+     * null) is not remembered, so a later capture may still send it.
+     */
     public function captureException(\Throwable $e, ?Scope $scope = null): ?string
     {
-        return $this->capture($this->normalizer->fromException($e), $scope);
+        if (isset($this->sent[$e])) {
+            return $this->sent[$e];
+        }
+
+        try {
+            $event = $this->normalizer->fromException($e);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        $id = $this->capture($event, $scope);
+        if ($id !== null) {
+            $this->sent[$e] = $id;
+        }
+
+        return $id;
     }
 
     public function captureMessage(string $message, string $level = 'info', ?Scope $scope = null): ?string
