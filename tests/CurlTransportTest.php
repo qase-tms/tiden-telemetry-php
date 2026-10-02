@@ -60,6 +60,10 @@ final class CurlTransportTest extends TestCase
             }
             usleep(50_000);
         }
+        // tearDownAfterClass does not run when setUpBeforeClass fails: stop the server here.
+        proc_terminate($proc);
+        proc_close($proc);
+        self::$server = null;
         self::fail('php -S did not start on port '.self::$port);
     }
 
@@ -83,7 +87,8 @@ final class CurlTransportTest extends TestCase
 
     public function test_success_sends_envelope_with_headers_and_reports_nothing(): void
     {
-        $envelope = $this->envelope(2048);
+        // Over 1 MiB: without the empty "Expect:" header, curl would send "Expect: 100-continue".
+        $envelope = $this->envelope(1_100_000);
         $this->transport('/ok')->send($envelope);
 
         $this->assertSame([], $this->failures);
@@ -205,6 +210,20 @@ final class CurlTransportTest extends TestCase
         $this->assertCount(1, $this->requests());
     }
 
+    public function test_handle_that_cannot_be_created_is_reported_without_backoff(): void
+    {
+        // libcurl rejects URLs over 8 MB, so curl_init() returns false.
+        $transport = new CurlTransport('http://127.0.0.1/'.str_repeat('a', 8_100_000), 2.0, $this->recorder());
+        $envelope = $this->envelope();
+
+        $transport->send($envelope);
+        $transport->send($envelope);
+
+        $this->assertCount(2, $this->failures);
+        $this->assertFailure('curl_error', null, strlen($envelope), null, $this->failures[0]);
+        $this->assertFailure('curl_error', null, strlen($envelope), null, $this->failures[1], 'nothing was attempted, so no backoff');
+    }
+
     private function transport(string $path, float $timeout = 2.0, float $retryAfterDefault = 60.0): CurlTransport
     {
         return new CurlTransport($this->url($path), $timeout, $this->recorder(), $retryAfterDefault);
@@ -235,11 +254,12 @@ final class CurlTransportTest extends TestCase
     }
 
     /** @param array<string,mixed> $failure */
-    private function assertFailure(string $reason, ?int $status, int $bytes, ?int $curlErrno, array $failure): void
+    private function assertFailure(string $reason, ?int $status, int $bytes, ?int $curlErrno, array $failure, string $message = ''): void
     {
         $this->assertSame(
             ['reason' => $reason, 'status' => $status, 'bytes' => $bytes, 'curl_errno' => $curlErrno],
             $failure,
+            $message,
         );
         // Never the URL (it carries the key) and never the payload.
         $this->assertStringNotContainsString(self::KEY, (string) json_encode($failure));

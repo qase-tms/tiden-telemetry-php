@@ -61,12 +61,17 @@ final class CurlTransport implements TransportInterface
 
             return;
         }
+        // No handle means nothing was attempted: report it, but start no backoff.
         if (! function_exists('curl_init')) {
+            $this->fail('curl_error', null, $bytes, null);
+
             return;
         }
 
         $ch = curl_init($this->url);
         if ($ch === false) {
+            $this->fail('curl_error', null, $bytes, null);
+
             return;
         }
 
