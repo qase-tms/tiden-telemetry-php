@@ -61,13 +61,35 @@ final class Options
             sendDefaultPii: (bool) ($o['send_default_pii'] ?? false),
             maxBreadcrumbs: (int) ($o['max_breadcrumbs'] ?? 100),
             beforeSend: isset($o['before_send']) && is_callable($o['before_send']) ? $o['before_send'] : null,
-            httpTimeout: (float) ($o['http_timeout'] ?? 2.0),
-            maxEnvelopeBytes: (int) ($o['max_envelope_bytes'] ?? 921600),
+            httpTimeout: self::positiveFloat($o['http_timeout'] ?? null, 2.0),
+            maxEnvelopeBytes: self::positiveInt($o['max_envelope_bytes'] ?? null, 921600),
             onTransportFailure: isset($o['on_transport_failure']) && is_callable($o['on_transport_failure'])
                 ? $o['on_transport_failure']
                 : null,
             retryAfterDefault: (float) ($o['retry_after_default'] ?? 60.0),
         );
+    }
+
+    /** null, '' and values <= 0 (an empty env var casts to 0) mean "not set". */
+    private static function positiveFloat(mixed $value, float $default): float
+    {
+        if ($value === null || $value === '' || ! is_scalar($value)) {
+            return $default;
+        }
+        $f = (float) $value;
+
+        return $f > 0 ? $f : $default;
+    }
+
+    /** null, '' and values <= 0 (an empty env var casts to 0) mean "not set". */
+    private static function positiveInt(mixed $value, int $default): int
+    {
+        if ($value === null || $value === '' || ! is_scalar($value)) {
+            return $default;
+        }
+        $i = (int) $value;
+
+        return $i > 0 ? $i : $default;
     }
 
     /** @return (callable(array<string,mixed>): (array<string,mixed>|null))|null */

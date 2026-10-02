@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tiden\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tiden\Options;
 
@@ -72,5 +73,36 @@ final class OptionsTest extends TestCase
         $this->assertSame(10, $o->maxBreadcrumbs);
         $this->assertSame($before, $o->beforeSend());
         $this->assertSame(2.0, $o->httpTimeout);
+    }
+
+    /** @return iterable<string,array{mixed}> */
+    public static function unsetValues(): iterable
+    {
+        yield 'null' => [null];
+        yield 'empty string (empty env var)' => [''];
+        yield 'zero' => [0];
+        yield 'zero string' => ['0'];
+        yield 'negative' => [-1];
+        yield 'non-scalar' => [['x']];
+    }
+
+    #[DataProvider('unsetValues')]
+    public function test_from_array_falls_back_to_defaults_for_non_positive_values(mixed $value): void
+    {
+        $o = Options::fromArray([
+            'dsn' => 'http://k@localhost/p',
+            'http_timeout' => $value,
+            'max_envelope_bytes' => $value,
+        ]);
+
+        $this->assertSame(2.0, $o->httpTimeout);
+        $this->assertSame(921600, $o->maxEnvelopeBytes);
+    }
+
+    public function test_from_array_accepts_sub_second_timeout(): void
+    {
+        $o = Options::fromArray(['dsn' => 'http://k@localhost/p', 'http_timeout' => '0.5']);
+
+        $this->assertSame(0.5, $o->httpTimeout);
     }
 }
