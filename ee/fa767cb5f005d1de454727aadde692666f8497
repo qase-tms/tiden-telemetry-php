@@ -1,0 +1,18 @@
+src/Client.php
+  h_aa32cc94f0cce6 7,17-18,29-30,53-83
+src/EventNormalizer.php
+  h_aa32cc94f0cce6 54
+tests/ClientTest.php
+  h_aa32cc94f0cce6 272-283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eefa767cb5f005d1de454727aadde692666f8497",
+  "prompts": {},
+  "humans": {
+    "h_aa32cc94f0cce6": {
+      "author": "prostoandrei <avaganov@qase.io>"
+    }
+  }
+}
