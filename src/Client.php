@@ -71,23 +71,36 @@ final class Client
             return self::$version;
         }
 
-        $resolved = self::VERSION;
+        $resolved = null;
         try {
             if (class_exists(InstalledVersions::class)
                 && InstalledVersions::isInstalled('tiden/telemetry-php')) {
-                $pretty = InstalledVersions::getPrettyVersion('tiden/telemetry-php');
-                if (is_string($pretty) && $pretty !== ''
-                    && ! str_starts_with($pretty, 'dev-')
-                    && ! str_ends_with($pretty, '-dev')
-                    && ! str_contains($pretty, 'no-version-set')) {
-                    $resolved = preg_replace('/^v(?=\d)/', '', $pretty) ?? $pretty;
-                }
+                $resolved = self::normalizeInstalledVersion(InstalledVersions::getPrettyVersion('tiden/telemetry-php'));
             }
         } catch (\Throwable) {
             // Fall back to the constant.
         }
 
-        return self::$version = $resolved;
+        return self::$version = $resolved ?? self::VERSION;
+    }
+
+    /**
+     * Maps a Composer pretty version to the sdk.version value, or null when it is
+     * not a release: empty, a dev branch ("dev-main", "0.2.x-dev") or the root
+     * package without a version ("1.0.0+no-version-set"). Drops a tag's leading "v".
+     *
+     * @internal public for tests only
+     */
+    public static function normalizeInstalledVersion(?string $pretty): ?string
+    {
+        if ($pretty === null || $pretty === ''
+            || str_starts_with($pretty, 'dev-')
+            || str_ends_with($pretty, '-dev')
+            || str_contains($pretty, 'no-version-set')) {
+            return null;
+        }
+
+        return preg_replace('/^v(?=\d)/', '', $pretty) ?? $pretty;
     }
 
     /**
